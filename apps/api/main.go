@@ -13,8 +13,11 @@ func main() {
 	fmt.Println("EcoWatch API is starting...")
 
 	http.HandleFunc("/health", handlers.GetHealth)
-	http.HandleFunc("/api/v1/sensors", handlers.GetSensors)
-	http.HandleFunc("/api/v1/sensors/{id}", handlers.GetSensorByID)
+	// sensors routes
+	http.HandleFunc("GET /api/v1/sensors", handlers.GetSensors)
+	http.HandleFunc("POST /api/v1/sensors", handlers.CreateSensor)
+	http.HandleFunc("PUT /api/v1/sensors/{id}", handlers.UpdateSensor)
+	http.HandleFunc("GET /api/v1/sensors/{id}", handlers.GetSensorByID)
 
 	err := http.ListenAndServe(":8080", nil)
 	if errors.Is(err, http.ErrServerClosed) {

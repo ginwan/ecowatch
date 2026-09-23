@@ -1,32 +1,62 @@
 [
-    {
-        "id": 1,
-        "facility_id": 1,
-        "name": "Main Facility Temperature Sensor",
-        "type": "temperature",
-        "unit": "°C",
-        "threshold": 80,
-        "status": "active",
-        "created_at": "2026-09-22T08:00:00Z"
-    },
-    {
-        "id": 2,
-        "facility_id": 1,
-        "name": "Main Facility Pressure Sensor",
-        "type": "pressure",
-        "unit": "bar",
-        "threshold": 12,
-        "status": "active",
-        "created_at": "2026-09-22T08:05:00Z"
-    },
-    {
-        "id": 3,
-        "facility_id": 1,
-        "name": "Main Facility Gas Sensor",
-        "type": "gas_concentration",
-        "unit": "ppm",
-        "threshold": 100,
-        "status": "active",
-        "created_at": "2026-09-22T08:10:00Z"
-    }
+  {
+    "id": 1,
+    "name": "Updated Name",
+    "type": "temperature",
+    "facility_id": 1,
+    "unit": "�C",
+    "min_threshold": 0,
+    "max_threshold": 100,
+    "status": "active"
+  },
+  {
+    "id": 2,
+    "name": "Main Line Pressure Sensor",
+    "type": "pressure",
+    "facility_id": 1,
+    "unit": "psi",
+    "min_threshold": 20,
+    "max_threshold": 150,
+    "status": "active"
+  },
+  {
+    "id": 3,
+    "name": "Exhaust Gas Sensor",
+    "type": "gas",
+    "facility_id": 2,
+    "unit": "ppm",
+    "min_threshold": 0,
+    "max_threshold": 50,
+    "status": "active"
+  },
+  {
+    "id": 4,
+    "name": "Storage Tank Temp Sensor",
+    "type": "temperature",
+    "facility_id": 2,
+    "unit": "°C",
+    "min_threshold": -5,
+    "max_threshold": 40,
+    "status": "inactive"
+  },
+  {
+    "id": 5,
+    "name": "Cooling System Pressure Sensor",
+    "type": "pressure",
+    "facility_id": 3,
+    "unit": "psi",
+    "min_threshold": 15,
+    "max_threshold": 100,
+    "status": "active"
+  },
+  {
+    "id": 6,
+    "name": "Test Sensor",
+    "type": "temperature",
+    "facility_id": 1,
+    "unit": "°C",
+    "min_threshold": 0,
+    "max_threshold": 100,
+    "status": "active"
+  }
 ]
