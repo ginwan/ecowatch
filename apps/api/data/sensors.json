@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "facility_id": 1,
+        "name": "Main Facility Temperature Sensor",
+        "type": "temperature",
+        "unit": "°C",
+        "threshold": 80,
+        "status": "active",
+        "created_at": "2026-09-22T08:00:00Z"
+    },
+    {
+        "id": 2,
+        "facility_id": 1,
+        "name": "Main Facility Pressure Sensor",
+        "type": "pressure",
+        "unit": "bar",
+        "threshold": 12,
+        "status": "active",
+        "created_at": "2026-09-22T08:05:00Z"
+    },
+    {
+        "id": 3,
+        "facility_id": 1,
+        "name": "Main Facility Gas Sensor",
+        "type": "gas_concentration",
+        "unit": "ppm",
+        "threshold": 100,
+        "status": "active",
+        "created_at": "2026-09-22T08:10:00Z"
+    }
+]
