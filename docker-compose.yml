@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:14.24-alpine3.23
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ecowatch
+    ports:
+      - "5432:5432" # this postgres default port, "outside:inside"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
