@@ -3,27 +3,19 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"log"
-	"context"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ginwan/ecowatch/apps/api/handlers"
 )
 
 func main() {
-	fmt.Println("EcoWatch API is starting...")
-
-	connStr := "postgres://postgres:postgres@localhost:5432/ecowatch"
-
-	pool, err := pgxpool.New(context.Background(), connStr)
+	pool, err := connectDB()
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v", err)
 	}
 	defer pool.Close()
-
-	fmt.Println("Connected to database!")
 
 	http.HandleFunc("/health", handlers.GetHealth)
 	// sensors routes
