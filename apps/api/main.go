@@ -18,6 +18,7 @@ func main() {
 	http.HandleFunc("POST /api/v1/sensors", handlers.CreateSensor)
 	http.HandleFunc("PUT /api/v1/sensors/{id}", handlers.UpdateSensor)
 	http.HandleFunc("GET /api/v1/sensors/{id}", handlers.GetSensorByID)
+	http.HandleFunc("DELETE /api/v1/sensors/{id}", handlers.DeleteSensor)
 
 	err := http.ListenAndServe(":8080", nil)
 	if errors.Is(err, http.ErrServerClosed) {

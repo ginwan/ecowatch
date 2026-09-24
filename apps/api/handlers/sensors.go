@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"slices"
 	"strconv"
 
 	"github.com/ginwan/ecowatch/apps/api/models"
@@ -190,6 +191,57 @@ func UpdateSensor(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(sensor)
+			return
+		}
+	}
+	http.Error(w, "Sensor not found", http.StatusNotFound)
+}
+
+
+func DeleteSensor(w http.ResponseWriter, r *http.Request) {
+	sensorID := r.PathValue("id")
+
+	id, err := strconv.Atoi(sensorID)
+	if err != nil {
+		http.Error(w, "Invalid Sensor ID", http.StatusBadRequest)
+		return
+	}
+
+	data, err := os.ReadFile("data/sensors.json")
+	fmt.Println("Reading file...")
+	if err != nil{
+		http.Error(w, "Can't read sensors data", http.StatusInternalServerError)
+		return
+	}
+
+	var sensors []models.Sensor
+	err = json.Unmarshal(data, &sensors)
+	if err != nil{
+		http.Error(w, 
+			fmt.Sprintf("Unable to parse sensor data %v", err),
+			http.StatusBadRequest)
+		return
+	}
+
+	for i, s := range sensors{
+		if(s.ID == id){
+			sensors = slices.Delete(sensors, i, i+1)
+
+			// write the updated sensors slice back to the file
+			addedData, err := json.MarshalIndent(sensors, "", "  ")
+			if err != nil {
+				http.Error(w, "Failed to marshal updated sensors data", http.StatusInternalServerError)
+				return
+			}
+			err = os.WriteFile("data/sensors.json", addedData, 0644)
+			if err != nil {
+				http.Error(w, "Failed to write updated sensors data", http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(sensors)
 			return
 		}
 	}

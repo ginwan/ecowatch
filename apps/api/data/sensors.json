@@ -1,15 +1,5 @@
 [
   {
-    "id": 1,
-    "name": "Updated Name",
-    "type": "temperature",
-    "facility_id": 1,
-    "unit": "�C",
-    "min_threshold": 0,
-    "max_threshold": 100,
-    "status": "active"
-  },
-  {
     "id": 2,
     "name": "Main Line Pressure Sensor",
     "type": "pressure",
