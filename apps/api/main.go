@@ -16,7 +16,8 @@ func main() {
 		log.Fatalf("Unable to connect to database: %v", err)
 	}
 	defer pool.Close()
-
+	fmt.Println("Connected to database!")
+	
 	http.HandleFunc("/health", handlers.GetHealth)
 	// sensors routes
 	http.HandleFunc("GET /api/v1/sensors", handlers.GetSensors)
