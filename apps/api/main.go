@@ -17,16 +17,19 @@ func main() {
 	}
 	defer pool.Close()
 	fmt.Println("Connected to database!")
-	
-	http.HandleFunc("/health", handlers.GetHealth)
-	// sensors routes
-	http.HandleFunc("GET /api/v1/sensors", handlers.GetSensors)
-	http.HandleFunc("POST /api/v1/sensors", handlers.CreateSensor)
-	http.HandleFunc("PUT /api/v1/sensors/{id}", handlers.UpdateSensor)
-	http.HandleFunc("GET /api/v1/sensors/{id}", handlers.GetSensorByID)
-	http.HandleFunc("DELETE /api/v1/sensors/{id}", handlers.DeleteSensor)
 
-	err = http.ListenAndServe(":8080", nil)
+	mux := http.NewServeMux()
+	sensorHandler := &handlers.SensorHandler{Pool: pool} 
+	
+	mux.HandleFunc("/health", handlers.GetHealth)
+	// sensors routes
+	mux.HandleFunc("GET /api/v1/sensors", sensorHandler.GetSensors)
+	mux.HandleFunc("POST /api/v1/sensors", sensorHandler.CreateSensor)
+	mux.HandleFunc("GET /api/v1/sensors/{id}", sensorHandler.GetSensorByID)
+	// http.HandleFunc("PUT /api/v1/sensors/{id}", handlers.UpdateSensor)
+	// http.HandleFunc("DELETE /api/v1/sensors/{id}", handlers.DeleteSensor)
+
+	err = http.ListenAndServe(":8080", mux)
 	if errors.Is(err, http.ErrServerClosed) {
 		fmt.Printf("server closed\n")
 	} else if err != nil {
