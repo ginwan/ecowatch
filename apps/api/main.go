@@ -19,15 +19,15 @@ func main() {
 	fmt.Println("Connected to database!")
 
 	mux := http.NewServeMux()
-	sensorHandler := &handlers.SensorHandler{Pool: pool} 
-	
+	sensorHandler := &handlers.SensorHandler{Pool: pool}
+
 	mux.HandleFunc("/health", handlers.GetHealth)
 	// sensors routes
 	mux.HandleFunc("GET /api/v1/sensors", sensorHandler.GetSensors)
 	mux.HandleFunc("POST /api/v1/sensors", sensorHandler.CreateSensor)
+	mux.HandleFunc("PUT /api/v1/sensors/{id}", sensorHandler.UpdateSensor)
 	mux.HandleFunc("GET /api/v1/sensors/{id}", sensorHandler.GetSensorByID)
-	// http.HandleFunc("PUT /api/v1/sensors/{id}", handlers.UpdateSensor)
-	// http.HandleFunc("DELETE /api/v1/sensors/{id}", handlers.DeleteSensor)
+	mux.HandleFunc("DELETE /api/v1/sensors/{id}", sensorHandler.DeleteSensor)
 
 	err = http.ListenAndServe(":8080", mux)
 	if errors.Is(err, http.ErrServerClosed) {

@@ -114,13 +114,13 @@ func (h *SensorHandler) GetSensorByID(w http.ResponseWriter, r *http.Request) {
 		&sensor.MaxThreshold,
 		&sensor.Status)
 	if err != nil {
-    if errors.Is(err, pgx.ErrNoRows) {
-        http.Error(w, "Sensor not found", http.StatusNotFound)
-        return
-    }
-    http.Error(w, "Failed to get sensor data", http.StatusInternalServerError)
-    return
-}
+		if errors.Is(err, pgx.ErrNoRows) {
+			http.Error(w, "Sensor not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Failed to get sensor data", http.StatusInternalServerError)
+		return
+	}
 	sensor.ID = id
 
 	w.Header().Set("Content-Type", "application/json")
@@ -128,117 +128,82 @@ func (h *SensorHandler) GetSensorByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sensor)
 }
 
-// func (h *SensorHandler) UpdateSensor(w http.ResponseWriter, r *http.Request) {
-// 	sensorID := r.PathValue("id")
+func (h *SensorHandler) UpdateSensor(w http.ResponseWriter, r *http.Request) {
+	sensorID := r.PathValue("id")
 
-// 	id, err := strconv.Atoi(sensorID)
-// 	if err != nil {
-// 		http.Error(w, "Invalid Sensor ID", http.StatusBadRequest)
-// 		return
-// 	}
+	id, err := strconv.Atoi(sensorID)
+	if err != nil {
+		http.Error(w, "Invalid Sensor ID", http.StatusBadRequest)
+		return
+	}
 
-// 	var sensor models.Sensor
-// 	// your fixed decode line here
-// 	err = json.NewDecoder(r.Body).Decode(&sensor)
-// 	if err != nil {
-// 		http.Error(
-// 			w,
-// 			fmt.Sprintf("Unable to parse sensor data: %v", err),
-// 			http.StatusInternalServerError,
-// 		)
-// 		return
-// 	}
+	var sensor models.Sensor
+	// your fixed decode line here
+	err = json.NewDecoder(r.Body).Decode(&sensor)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("Unable to parse sensor data: %v", err),
+			http.StatusInternalServerError,
+		)
+		return
+	}
 
-// 	data, err := os.ReadFile("data/sensors.json")
-// 	fmt.Println("Reading sensors data from file...")
-// 	if err != nil {
-// 		http.Error(w, "Failed to read sensors data", http.StatusInternalServerError)
-// 		return
-// 	}
+	sqlString := `UPDATE sensors 
+		SET 
+			name = $1, 
+			type = $2, 
+			facility_id = $3, 
+			unit = $4, 
+			min_threshold = $5, 
+			max_threshold = $6, 
+			status = $7 
+		WHERE 
+			id = $8`
 
-// 	var sensors []models.Sensor
-// 	err = json.Unmarshal(data, &sensors)
-// 	if err != nil {
-// 		http.Error(
-// 			w,
-// 			fmt.Sprintf("Unable to parse sensor data: %v", err),
-// 			http.StatusInternalServerError,
-// 		)
-// 		return
-// 	}
+	row, err := h.Pool.Exec(context.Background(), sqlString,
+		sensor.Name, sensor.Type, sensor.FacilityID, sensor.Unit, sensor.MinThreshold, sensor.MaxThreshold, sensor.Status, id,
+	)
 
-// 	for i, s := range sensors {
-// 		if s.ID == id {
-// 			sensor.ID = id
-// 			sensors[i] = sensor
+	if err != nil {
+		http.Error(w, "Update sensor data failed", http.StatusInternalServerError)
+		return
+	}
 
-// 			// write the updated sensors slice back to the file
-// 			addedData, err := json.MarshalIndent(sensors, "", "  ")
-// 			if err != nil {
-// 				http.Error(w, "Failed to marshal updated sensors data", http.StatusInternalServerError)
-// 				return
-// 			}
-// 			err = os.WriteFile("data/sensors.json", addedData, 0644)
-// 			if err != nil {
-// 				http.Error(w, "Failed to write updated sensors data", http.StatusInternalServerError)
-// 				return
-// 			}
+	if row.RowsAffected() == 0 {
+		http.Error(w, "Sensor not found", http.StatusNotFound)
+		return
+	}
 
-// 			w.Header().Set("Content-Type", "application/json")
-// 			w.WriteHeader(http.StatusOK)
-// 			json.NewEncoder(w).Encode(sensor)
-// 			return
-// 		}
-// 	}
-// 	http.Error(w, "Sensor not found", http.StatusNotFound)
-// }
+	sensor.ID = id
 
-// func (h *SensorHandler) DeleteSensor(w http.ResponseWriter, r *http.Request) {
-// 	sensorID := r.PathValue("id")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(sensor)
+}
 
-// 	id, err := strconv.Atoi(sensorID)
-// 	if err != nil {
-// 		http.Error(w, "Invalid Sensor ID", http.StatusBadRequest)
-// 		return
-// 	}
+func (h *SensorHandler) DeleteSensor(w http.ResponseWriter, r *http.Request) {
+	sensorID := r.PathValue("id")
 
-// 	data, err := os.ReadFile("data/sensors.json")
-// 	fmt.Println("Reading file...")
-// 	if err != nil {
-// 		http.Error(w, "Can't read sensors data", http.StatusInternalServerError)
-// 		return
-// 	}
+	id, err := strconv.Atoi(sensorID)
+	if err != nil {
+		http.Error(w, "Invalid Sensor ID", http.StatusBadRequest)
+		return
+	}
 
-// 	var sensors []models.Sensor
-// 	err = json.Unmarshal(data, &sensors)
-// 	if err != nil {
-// 		http.Error(w,
-// 			fmt.Sprintf("Unable to parse sensor data %v", err),
-// 			http.StatusBadRequest)
-// 		return
-// 	}
+	sqlString := `DELETE FROM sensors WHERE id = $1`
 
-// 	for i, s := range sensors {
-// 		if s.ID == id {
-// 			sensors = slices.Delete(sensors, i, i+1)
+	row, err := h.Pool.Exec(context.Background(), sqlString, id)
 
-// 			// write the updated sensors slice back to the file
-// 			addedData, err := json.MarshalIndent(sensors, "", "  ")
-// 			if err != nil {
-// 				http.Error(w, "Failed to marshal updated sensors data", http.StatusInternalServerError)
-// 				return
-// 			}
-// 			err = os.WriteFile("data/sensors.json", addedData, 0644)
-// 			if err != nil {
-// 				http.Error(w, "Failed to write updated sensors data", http.StatusInternalServerError)
-// 				return
-// 			}
+	if err != nil {
+		http.Error(w, "Delete sensor failed", http.StatusInternalServerError)
+		return
+	}
 
-// 			w.Header().Set("Content-Type", "application/json")
-// 			w.WriteHeader(http.StatusOK)
-// 			json.NewEncoder(w).Encode(sensors)
-// 			return
-// 		}
-// 	}
-// 	http.Error(w, "Sensor not found", http.StatusNotFound)
-// }
+	if row.RowsAffected() == 0 {
+		http.Error(w, "Sensor not found", http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
