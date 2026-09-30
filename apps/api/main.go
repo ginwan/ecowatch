@@ -20,6 +20,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	sensorHandler := &handlers.SensorHandler{Pool: pool}
+	facilityHandler := &handlers.FacilityHandler{Pool: pool}
 
 	mux.HandleFunc("/health", handlers.GetHealth)
 	// sensors routes
@@ -28,6 +29,13 @@ func main() {
 	mux.HandleFunc("PUT /api/v1/sensors/{id}", sensorHandler.UpdateSensor)
 	mux.HandleFunc("GET /api/v1/sensors/{id}", sensorHandler.GetSensorByID)
 	mux.HandleFunc("DELETE /api/v1/sensors/{id}", sensorHandler.DeleteSensor)
+
+	// facilities routes
+	mux.HandleFunc("GET /api/v1/facilities", facilityHandler.GetFacilities)
+	mux.HandleFunc("POST /api/v1/facilities", facilityHandler.CreateFacilities)
+	mux.HandleFunc("PUT /api/v1/facilities/{id}", facilityHandler.UpdateFacility)
+	mux.HandleFunc("GET /api/v1/facilities/{id}", facilityHandler.GetFacilityByID)
+	mux.HandleFunc("DELETE /api/v1/facilities/{id}", facilityHandler.DeleteFacility)
 
 	err = http.ListenAndServe(":8080", mux)
 	if errors.Is(err, http.ErrServerClosed) {

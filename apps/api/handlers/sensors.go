@@ -22,7 +22,7 @@ type SensorHandler struct {
 func (h *SensorHandler) GetSensors(w http.ResponseWriter, r *http.Request) {
 	rows, err := h.Pool.Query(context.Background(), "SELECT id, name, type, facility_id, unit, min_threshold, max_threshold, status FROM sensors")
 	if err != nil {
-		http.Error(w, "Failed to sensors data", http.StatusInternalServerError)
+		http.Error(w, "Failed to get sensors data", http.StatusInternalServerError)
 		return
 	}
 
