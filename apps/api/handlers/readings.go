@@ -65,6 +65,37 @@ func (h *ReadingHandler) CreateReading(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var minThreshold float64
+	var maxThreshold float64
+
+	sqlStr := `SELECT min_threshold, max_threshold FROM sensors WHERE id = $1`;
+	err = h.Pool.QueryRow(context.Background(), sqlStr, reading.SensorID).Scan(&minThreshold, &maxThreshold)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Can't access sensors data %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	if(reading.Value > maxThreshold){
+		sqlString := `INSERT INTO alerts(sensor_id, value, status, message)
+		VALUES ($1, $2, $3, $4)`
+
+		_, err := h.Pool.Exec(context.Background(), sqlString, reading.SensorID, reading.Value, "high", "Recorded high value")
+		if err != nil {
+		http.Error(w, fmt.Sprintf("Unable to create alert %v", err), http.StatusInternalServerError)
+		return
+		}
+	
+	}else if (reading.Value < minThreshold){
+		sqlString := `INSERT INTO alerts(sensor_id, value, status, message)
+		VALUES ($1, $2, $3, $4) `
+
+		_, err := h.Pool.Exec(context.Background(), sqlString, reading.SensorID, reading.Value, "low", "Recorded low value")
+		if err != nil {
+		http.Error(w, fmt.Sprintf("Unable to create alert %v", err), http.StatusInternalServerError)
+		return
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(reading)
